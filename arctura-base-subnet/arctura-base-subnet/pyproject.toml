@@ -1,0 +1,90 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "arctura-base-subnet"
+version = "0.1.0"
+description = "The first open-source Bittensor subnet bridging Base blockchain intelligence into the decentralized AI network."
+readme = "README.md"
+license = { text = "Apache-2.0" }
+authors = [
+    { name = "Arctura Collective", email = "council@arctura.network" }
+]
+keywords = [
+    "bittensor", "base", "subnet", "blockchain", "decentralized-ai",
+    "resonance-bft", "attestation", "agentkit", "merkle"
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+requires-python = ">=3.10"
+
+dependencies = [
+    "bittensor>=6.9.0",
+    "torch>=2.0.0",
+    "web3>=6.0.0",
+    "coincurve>=18.0.0",
+    "merkletools>=1.0.3",
+    "pydantic>=2.0.0",
+    "httpx>=0.24.0",
+    "python-dotenv>=1.0.0",
+    "rich>=13.0.0",
+]
+
+[project.optional-dependencies]
+agentkit = [
+    "coinbase-agentkit>=0.1.0",
+    "cdp-sdk>=0.0.1",
+]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.1.0",
+    "mypy>=1.5.0",
+    "black>=23.9.0",
+    "ruff>=0.1.0",
+    "types-requests>=2.31.0",
+]
+
+[project.urls]
+Homepage = "https://base.arctura.network"
+Repository = "https://github.com/virtualmase/arctura-base-subnet"
+Documentation = "https://base.arctura.network/docs"
+"Bug Tracker" = "https://github.com/virtualmase/arctura-base-subnet/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["arctura_base*"]
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311", "py312"]
+
+[tool.ruff]
+line-length = 100
+select = ["E", "F", "I", "N", "W", "UP"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = false
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = "-v --tb=short"
+
+[tool.coverage.run]
+source = ["arctura_base"]
+omit = ["tests/*", "neurons/*"]

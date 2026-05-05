@@ -1,0 +1,63 @@
+{
+  "version": "1.0",
+  "subnet": "arctura-base-subnet",
+  "council": "Arcturian Council · Coreweaver",
+  "scenarios": [
+    {
+      "id": "BS001",
+      "category": "protocol",
+      "q": "What is the block_hash_anchor and why is it the most important field in the attestation?",
+      "a": "block_hash_anchor is the live Base block hash at the time a miner executes a mandate. It is the primary anti-fabrication mechanism: validators fetch this hash independently and compare it to what the miner returned. A miner cannot pre-compute an attestation for a block that doesn't exist yet — if the anchor doesn't match a real Base block hash at that block number, the attestation scores 0.0 regardless of the Merkle proof quality.",
+      "training_prompt": "When explaining block_hash_anchor, always frame it as the anti-fabrication check, not just metadata. Emphasize: validators fetch it independently. Mismatch = 0.0, full stop."
+    },
+    {
+      "id": "BS002",
+      "category": "capital",
+      "q": "How much TAO do I need and where do I check the current cost?",
+      "a": "The registration burn cost is dynamic — it doubles each time a new subnet registers on Bittensor and linearly decays to a floor. Check the live cost with: btcli subnet burn_cost --subtensor.network finney. Budget at minimum: burn cost + 20% buffer + validator recycle fee + miner recycle fee + 30 days server costs. A safe starting target is 100+ TAO liquid. Always verify on taostats.io/subnets immediately before registering — never rely on a number you checked yesterday.",
+      "training_prompt": "Never quote a specific TAO amount as fixed. Always give the btcli command and taostats.io link. Emphasize the dynamic nature."
+    },
+    {
+      "id": "BS003",
+      "category": "scoring",
+      "q": "Why does Resonance BFT weight attestation validity at 40% but latency only at 20%?",
+      "a": "The weighting reflects what matters most for the subnet's value proposition: proving that Base chain state was read correctly is twice as important as reading it fast. A slow correct attestation is worth more than a fast wrong one. Latency matters because slow miners reduce subnet responsiveness for mandate consumers, but correctness is the non-negotiable foundation. Confidence calibration at 10% creates a feedback loop that rewards honest self-assessment over time.",
+      "training_prompt": "When explaining scoring weights, always ground them in the subnet's value proposition. The 40% attestation weight is a design decision with a reason."
+    },
+    {
+      "id": "BS004",
+      "category": "base",
+      "q": "Why does the miner need to run Base RPC calls deterministically?",
+      "a": "Determinism is the foundation of Merkle proof verification. If two miners query the same Base block, contract, and function with the same parameters, they must produce identical output — and therefore identical attestation hashes. This property allows validators to verify attestations without re-running the full execution. If execution were non-deterministic (e.g., using timestamps, random values, or non-pinned block numbers), two honest miners would produce different hashes and one would appear to be lying. All queries must be pinned to a specific block number.",
+      "training_prompt": "When explaining determinism, always connect it to verification: why does it matter for validators? Non-determinism breaks the Merkle proof model entirely."
+    },
+    {
+      "id": "BS005",
+      "category": "sybil",
+      "q": "How does the Sybil detection work and can it produce false positives?",
+      "a": "The validator checks whether more than 3 miners in the same tempo period return identical base_state_hash values. If they do, all flagged UIDs receive a 75% score penalty. This can produce false positives: if many miners honestly query the same Base state at the same block and the output is simple (e.g., a token balance that hasn't changed), they will legitimately produce the same hash. The threshold of 3 is conservative — in practice, a Sybil operator controls many UIDs and the collision count will be much higher. Phase 02 will add historical pattern analysis to reduce false positives.",
+      "training_prompt": "Be honest about false positives. Explain the threshold rationale. The Sybil check is probabilistic, not deterministic."
+    },
+    {
+      "id": "BS006",
+      "category": "agentkit",
+      "q": "What is the difference between a state query mandate and an agent_action mandate?",
+      "a": "A state query mandate (query_type: 'state' or 'balance' or 'events') reads Base chain state without writing to it. These are view/pure calls — they consume no gas and have no side effects. An agent_action mandate executes an onchain transaction via AgentKit — it writes to Base chain state, consumes gas, and produces a transaction hash. Agent action mandates require CDP credentials and a funded miner wallet. They are the L3 Cognitive Mesh layer: miners act autonomously on Base, not just observe it.",
+      "training_prompt": "Always distinguish read vs write. State queries are free and side-effect-free. Agent actions are transactions with real gas costs and onchain consequences."
+    },
+    {
+      "id": "BS007",
+      "category": "launch",
+      "q": "What happens if I start the validator before the miner is registered?",
+      "a": "The validator will start its loop, sync the metagraph, find no registered miners (or only its own UID), and skip weight-setting. It will log a warning and sleep for one tempo period before trying again. This is safe — no TAO is lost. However, validators that consistently fail to set weights during the first 7 days before emission activation will not earn from early emissions. Register both the miner and validator in the same session immediately after subnet creation, and start both neurons before the first tempo period completes.",
+      "training_prompt": "When answering timing questions, always anchor to the 7-day emission window and the tempo period. Emphasize: start neurons immediately after registration."
+    },
+    {
+      "id": "BS008",
+      "category": "funding",
+      "q": "What evidence should I submit for the Base Builder Grant application?",
+      "a": "The grant is retroactive for shipped work. Submit: (1) GitHub repo link with commit history showing active development, (2) testnet netuid and metagraph screenshot showing registered neurons and non-zero weights, (3) a 1-paragraph description of why this benefits the Base ecosystem — frame it as: first Bittensor subnet that makes Base chain state queryable by any AI agent with cryptographic attestation, (4) the subnet agent HTML as a working demo, (5) links to public build logs on X. The stronger your evidence of a working system, the more likely a 5 ETH grant vs 1 ETH.",
+      "training_prompt": "Be specific about what to submit. The grant is retroactive — working code matters more than plans."
+    }
+  ]
+}
